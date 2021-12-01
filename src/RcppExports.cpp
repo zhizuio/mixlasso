@@ -52,9 +52,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// mixLassoLoop
-arma::sp_mat mixLassoLoop(const arma::mat& V, const arma::sp_mat& C, const arma::umat& gIdx, const bool Tglasso, const arma::uvec& tIdx, const arma::mat& X, const arma::mat& Y, const bool intercept, const int num_nonpen, arma::vec L, const double lambda, const arma::vec& option, const double mu, const int NoVar, const double gamma, const arma::umat& y_mis, const double alpha);
-RcppExport SEXP _mixlasso_mixLassoLoop(SEXP VSEXP, SEXP CSEXP, SEXP gIdxSEXP, SEXP TglassoSEXP, SEXP tIdxSEXP, SEXP XSEXP, SEXP YSEXP, SEXP interceptSEXP, SEXP num_nonpenSEXP, SEXP LSEXP, SEXP lambdaSEXP, SEXP optionSEXP, SEXP muSEXP, SEXP NoVarSEXP, SEXP gammaSEXP, SEXP y_misSEXP, SEXP alphaSEXP) {
+// mixlassoLoop
+arma::sp_mat mixlassoLoop(const arma::mat& V, const arma::sp_mat& C, const arma::umat& gIdx, const bool Tglasso, const arma::uvec& tIdx, const arma::mat& X, const arma::mat& Y, const bool intercept, const int num_nonpen, arma::vec L, const double lambda, const arma::vec& option, const double mu, const int NoVar, const double gamma, const arma::umat& y_mis, const double alpha);
+RcppExport SEXP _mixlasso_mixlassoLoop(SEXP VSEXP, SEXP CSEXP, SEXP gIdxSEXP, SEXP TglassoSEXP, SEXP tIdxSEXP, SEXP XSEXP, SEXP YSEXP, SEXP interceptSEXP, SEXP num_nonpenSEXP, SEXP LSEXP, SEXP lambdaSEXP, SEXP optionSEXP, SEXP muSEXP, SEXP NoVarSEXP, SEXP gammaSEXP, SEXP y_misSEXP, SEXP alphaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -75,13 +75,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const double >::type gamma(gammaSEXP);
     Rcpp::traits::input_parameter< const arma::umat& >::type y_mis(y_misSEXP);
     Rcpp::traits::input_parameter< const double >::type alpha(alphaSEXP);
-    rcpp_result_gen = Rcpp::wrap(mixLassoLoop(V, C, gIdx, Tglasso, tIdx, X, Y, intercept, num_nonpen, L, lambda, option, mu, NoVar, gamma, y_mis, alpha));
+    rcpp_result_gen = Rcpp::wrap(mixlassoLoop(V, C, gIdx, Tglasso, tIdx, X, Y, intercept, num_nonpen, L, lambda, option, mu, NoVar, gamma, y_mis, alpha));
     return rcpp_result_gen;
 END_RCPP
 }
-// treeLassoLoop
-arma::sp_mat treeLassoLoop(const arma::mat& X, const arma::mat& Y, const arma::sp_mat& C, const arma::umat& gIdx, const double TauNorm, const bool intercept, const int num_nonpen, const double lambda, const arma::vec& option, const double mu);
-RcppExport SEXP _mixlasso_treeLassoLoop(SEXP XSEXP, SEXP YSEXP, SEXP CSEXP, SEXP gIdxSEXP, SEXP TauNormSEXP, SEXP interceptSEXP, SEXP num_nonpenSEXP, SEXP lambdaSEXP, SEXP optionSEXP, SEXP muSEXP) {
+// treelassoLoop
+arma::sp_mat treelassoLoop(const arma::mat& X, const arma::mat& Y, const arma::sp_mat& C, const arma::umat& gIdx, const double TauNorm, const bool intercept, const int num_nonpen, const double lambda, const arma::vec& option, const double mu);
+RcppExport SEXP _mixlasso_treelassoLoop(SEXP XSEXP, SEXP YSEXP, SEXP CSEXP, SEXP gIdxSEXP, SEXP TauNormSEXP, SEXP interceptSEXP, SEXP num_nonpenSEXP, SEXP lambdaSEXP, SEXP optionSEXP, SEXP muSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -95,7 +95,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type option(optionSEXP);
     Rcpp::traits::input_parameter< const double >::type mu(muSEXP);
-    rcpp_result_gen = Rcpp::wrap(treeLassoLoop(X, Y, C, gIdx, TauNorm, intercept, num_nonpen, lambda, option, mu));
+    rcpp_result_gen = Rcpp::wrap(treelassoLoop(X, Y, C, gIdx, TauNorm, intercept, num_nonpen, lambda, option, mu));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -104,8 +104,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_mixlasso_cal2norm", (DL_FUNC) &_mixlasso_cal2norm, 4},
     {"_mixlasso_shrink", (DL_FUNC) &_mixlasso_shrink, 4},
     {"_mixlasso_XXeigen", (DL_FUNC) &_mixlasso_XXeigen, 3},
-    {"_mixlasso_mixLassoLoop", (DL_FUNC) &_mixlasso_mixLassoLoop, 17},
-    {"_mixlasso_treeLassoLoop", (DL_FUNC) &_mixlasso_treeLassoLoop, 10},
+    {"_mixlasso_mixlassoLoop", (DL_FUNC) &_mixlasso_mixlassoLoop, 17},
+    {"_mixlasso_treelassoLoop", (DL_FUNC) &_mixlasso_treelassoLoop, 10},
     {NULL, NULL, 0}
 };
 

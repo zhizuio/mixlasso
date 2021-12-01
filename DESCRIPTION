@@ -18,7 +18,7 @@ Imports: doParallel, foreach, parallel, glmnet, tgp, penalizedSVM,
         stats, data.table, Rcpp, RcppArmadillo
 NeedsCompilation: yes
 SystemRequirements: C++11
-Packaged: 2021-11-26 14:58:19 UTC; zhiz
+Packaged: 2021-11-30 13:12:40 UTC; zhiz
 Author: Zhi Zhao [aut, cre],
   Manuela Zucknick [aut],
   Tero Aittokallio [ctb]

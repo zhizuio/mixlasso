@@ -225,7 +225,7 @@ arma::vec XXeigen( const arma::mat& X, const arma::mat& V, const arma::uvec& tId
 
     
 // [[Rcpp::export]]
-arma::sp_mat mixLassoLoop(const arma::mat& V, const arma::sp_mat& C, const arma::umat& gIdx, const bool Tglasso, const arma::uvec& tIdx, const arma::mat& X, const arma::mat& Y, const bool intercept, const int num_nonpen, arma::vec L, const double lambda, const arma::vec& option, const double mu, const int NoVar, const double gamma, const arma::umat& y_mis, const double alpha ) {
+arma::sp_mat mixlassoLoop(const arma::mat& V, const arma::sp_mat& C, const arma::umat& gIdx, const bool Tglasso, const arma::uvec& tIdx, const arma::mat& X, const arma::mat& Y, const bool intercept, const int num_nonpen, arma::vec L, const double lambda, const arma::vec& option, const double mu, const int NoVar, const double gamma, const arma::umat& y_mis, const double alpha ) {
 
     double obj = 0.;
     double obj_new = 0.;
@@ -500,7 +500,7 @@ arma::sp_mat mixLassoLoop(const arma::mat& V, const arma::sp_mat& C, const arma:
 }
 
 // [[Rcpp::export]]
-arma::sp_mat treeLassoLoop(const arma::mat& X, const arma::mat& Y, const arma::sp_mat& C, const arma::umat& gIdx, const double TauNorm, const bool intercept, const int num_nonpen, const double lambda, const arma::vec& option, const double mu) {
+arma::sp_mat treelassoLoop(const arma::mat& X, const arma::mat& Y, const arma::sp_mat& C, const arma::umat& gIdx, const double TauNorm, const bool intercept, const int num_nonpen, const double lambda, const arma::vec& option, const double mu) {
     
     double obj = 0.;
     double obj_new = 0.;

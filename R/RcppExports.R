@@ -13,11 +13,11 @@ XXeigen <- function(X, V, tIdx) {
     .Call('_mixlasso_XXeigen', PACKAGE = 'mixlasso', X, V, tIdx)
 }
 
-mixLassoLoop <- function(V, C, gIdx, Tglasso, tIdx, X, Y, intercept, num_nonpen, L, lambda, option, mu, NoVar, gamma, y_mis, alpha) {
-    .Call('_mixlasso_mixLassoLoop', PACKAGE = 'mixlasso', V, C, gIdx, Tglasso, tIdx, X, Y, intercept, num_nonpen, L, lambda, option, mu, NoVar, gamma, y_mis, alpha)
+mixlassoLoop <- function(V, C, gIdx, Tglasso, tIdx, X, Y, intercept, num_nonpen, L, lambda, option, mu, NoVar, gamma, y_mis, alpha) {
+    .Call('_mixlasso_mixlassoLoop', PACKAGE = 'mixlasso', V, C, gIdx, Tglasso, tIdx, X, Y, intercept, num_nonpen, L, lambda, option, mu, NoVar, gamma, y_mis, alpha)
 }
 
-treeLassoLoop <- function(X, Y, C, gIdx, TauNorm, intercept, num_nonpen, lambda, option, mu) {
-    .Call('_mixlasso_treeLassoLoop', PACKAGE = 'mixlasso', X, Y, C, gIdx, TauNorm, intercept, num_nonpen, lambda, option, mu)
+treelassoLoop <- function(X, Y, C, gIdx, TauNorm, intercept, num_nonpen, lambda, option, mu) {
+    .Call('_mixlasso_treelassoLoop', PACKAGE = 'mixlasso', X, Y, C, gIdx, TauNorm, intercept, num_nonpen, lambda, option, mu)
 }
 

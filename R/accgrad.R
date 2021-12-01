@@ -31,7 +31,7 @@ accgrad <- function(y, x, lambda, Tree, C, g_idx, TauNorm,  mu, option, num_nonp
   #load("treeLassoObj0.RData")
   #attach(treeLassoObj)
   #browser()
-  bx <- treeLassoLoop(X, Y, C, g_idx, TauNorm, intercept, num_nonpen, lambda, option, mu) 
+  bx <- treelassoLoop(X, Y, C, g_idx, TauNorm, intercept, num_nonpen, lambda, option, mu) 
   
   # XX <- crossprod(X)
   # XY <- crossprod(X, Y)
