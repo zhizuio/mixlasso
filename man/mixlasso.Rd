@@ -23,7 +23,7 @@ mixlasso(
   x.mis_test = NULL,
   tree.parm = NULL,
   cv.measure = "mse",
-  type.measure = "mse",
+  type.measure = "deviance",
   type.min = "lambda.min",
   standardize.response = FALSE,
   lambda = NULL,

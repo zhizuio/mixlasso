@@ -480,9 +480,7 @@ arma::sp_mat mixlassoLoop(const arma::mat& V, const arma::sp_mat& C, const arma:
         
         // stop if the estimated model is too dense or no variation of number of nonzero bx over the last 10 iterations
         if( /*((p*T*Y.n_cols>1000000) && (bw1_nonzero.n_elem > 0.1*p*T*Y.n_cols) && (iter > 30)) | ((iter>100) && (arma::stddev(num_nonzero)==0.)) |*/
-           ((bw1_nonzero.n_elem > 0.5*p*T*Y.n_cols) && (iter > 30)) |
-           (bw1_nonzero.n_elem>1000000) |
-           ((arma::abs(bx)).max()>50) ){
+           ((bw1_nonzero.n_elem > 0.5*p*T*Y.n_cols) && (bw1_nonzero.n_elem > 1000000) && (iter > 30)) | ((arma::abs(bx)).max()>100.) ){
             bx.fill(999.);
             Rcpp::Rcout << "Stopped because the estimated model is too dense or large betas!\n";
             break;

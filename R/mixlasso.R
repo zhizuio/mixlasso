@@ -43,23 +43,50 @@
 #' @references Zhao, Z. & Zucknick, M. (2020). \emph{Stuctured penalized regression for drug sensitivity prediction.} JRSSC.
 #' @export
 mixlasso <- function(x, y, z=NULL, x_test=NULL, y_test=NULL, z_test=NULL, p=NA, foldid=NULL, num.nonpen=0, method="IPF-lasso", family="gaussian", nfolds=5,
-                                y.mis=NULL, y.mis_test=NULL, x.mis=NULL, x.mis_test=NULL, tree.parm=NULL, cv.measure="mse", type.measure="mse", type.min="lambda.min", standardize.response=FALSE,
+                                y.mis=NULL, y.mis_test=NULL, x.mis=NULL, x.mis_test=NULL, tree.parm=NULL, cv.measure="mse", type.measure="deviance", type.min="lambda.min", standardize.response=FALSE,
                         lambda=NULL, bounds=NULL, bound.scale=NA, strata.surv=NULL, search.path=FALSE, EI.eps=0.01, fminlower=0, intercept=TRUE,
                         threshold=0, tol=1e-6, mu=0.01, NoVar=50, N=NULL, min.iter=20, seed=1234,parallel=FALSE, verbose=TRUE,t.idx=NULL,t.idx_test=NULL,
                         t.glasso=FALSE,alpha=1,gamma=0,
                         # the following parameters have problem to pass into tune.tree.re.interval
                         maxiter=10000,cov.proxy="FL",predict.re=FALSE,...){
  
+  if((method!="lasso") & (method!="tree-lasso") & is.null(bounds)){
+    if(method=="elastic-net"){
+      bounds <- t(data.frame(alpha=c(0,1)))
+    }else{
+      # the default setting for bounds is only for two data sources
+      if(method=="IPF-lasso" | method=="IPF-cox"){
+        bounds <- t(data.frame(ipf=c(0.1,10)))
+      }else{
+        if(method=="sIPF-elastic-net"){
+          bounds <- t(data.frame(alpha=c(0,1), ipf1 = c(0.1, 10)))
+        }else{
+          if(method=="IPF-elastic-net"){
+            bounds <- t(data.frame(alpha1=c(0,1), alpha2=c(0,1), ipf1 = c(0.5, 8)))
+          }else{
+            if(method=="IPF-tree-lasso"){
+              bounds <- t(data.frame(tree.ipf1 = c(0.1, 5)))
+            }else{
+              stop("Please give searching bounds for EPSGO algorithm!")
+            }
+          }
+        } 
+      }
+    } 
+    colnames(bounds) <- c("lower", "upper")
+  }
+  
+  fit <- NULL
   #=============
   # IPF-lasso, sIPFEN
   #=============
   if((method=="IPF-lasso") | (method=="sIPF-elastic-net")){
     
-    fit <- epsgo(Q.func = "tune.glmnet.interval", bounds = bounds, lambda=lambda, N=N,
+    fit0 <- epsgo(Q.func = "tune.glmnet.interval", bounds = bounds, lambda=lambda, N=N,
                  parms.coding = "none", seed = seed, fminlower = fminlower, x = x, y = y, num.nonpen=num.nonpen, bound.scale=bound.scale,
-                 family = family, foldid = foldid, type.min = type.min, p=p, intercept=intercept, standardize.response=standardize.response,
+                 family = family, foldid = foldid, nfolds = nfolds, type.min = type.min, p=p, intercept=intercept, standardize.response=standardize.response,
                  type.measure = type.measure, min.iter=min.iter, verbose=verbose, parallel=parallel, EI.eps=EI.eps, ...)
-    sumint <- summary(fit, verbose=F)
+    sumint <- summary(fit0, verbose=F)
     mse_cv <- sumint$opt.error
     alpha <- sumint$opt.alpha
     lambda <- sumint$opt.lambda
@@ -71,7 +98,7 @@ mixlasso <- function(x, y, z=NULL, x_test=NULL, y_test=NULL, z_test=NULL, p=NA, 
     }else{
       adpen <- c(rep(1,p[1]), rep(ipf,p[2]))
     }
-    Beta <- glmnet(x=x,y=y, family=family,
+    fit <- glmnet(x=x,y=y, family=family,
                           alpha=alpha,
                           offset = NULL,
                           lambda = seq(lambda*0.8,lambda*1.2,length=11),
@@ -79,9 +106,49 @@ mixlasso <- function(x, y, z=NULL, x_test=NULL, y_test=NULL, z_test=NULL, p=NA, 
                           intercept=intercept,
                           standardize.response=F)
     
-    ypred <- cbind(rep(1,dim(x_test)[1]),x_test)%*%matrix(c(Beta$a0[ceiling(11/2)], Beta$beta[,ceiling(11/2)]),ncol=1)
+    ypred <- cbind(rep(1,dim(x_test)[1]),x_test)%*%matrix(c(fit$a0[ceiling(11/2)], fit$beta[,ceiling(11/2)]),ncol=1)
     mse_val <- sum((y_test - ypred)^2)/prod(dim(y_test))
-    vs <- sum(Beta$beta[,ceiling(11/2)]!=0)
+    vs <- sum(fit$beta[,ceiling(11/2)]!=0)
+  }
+  
+  #=============
+  # IPF-Cox
+  #=============
+  if(method=="IPF-cox"){
+    
+    fit0 <- epsgo(Q.func = "tune.surv.interval", strata.surv=strata.surv, bounds = bounds, lambda=lambda, alpha=alpha, N=N,
+                 parms.coding = "none", seed = seed, fminlower = fminlower, x = x, y = y, num.nonpen=num.nonpen, bound.scale=bound.scale,
+                 family = "cox", foldid = foldid, nfolds = nfolds, type.min = type.min, p=p, intercept=intercept, standardize.response=standardize.response,
+                 type.measure = type.measure, min.iter=min.iter, verbose=verbose, parallel=parallel, EI.eps=EI.eps, ...)
+    sumint <- summary(fit0, verbose=F)
+    mse_cv <- sumint$opt.error
+    alpha <- sumint$opt.alpha
+    lambda <- sumint$opt.lambda
+    ipf <- sumint$opt.ipf
+    
+    # fit the optimal model
+    adpen <- c(rep(0,num.nonpen), rep(1, sum(p)))
+    if(length(p) > 1){
+      for(i in 1:(length(p)-1)){
+        adpen[num.nonpen+(cumsum(p)[i]+1):cumsum(p)[i+1]] <- ipf[i]
+      }
+    }
+    
+    if(is.null(strata.surv)){
+      y2 <- y
+    }else{
+      y2 <- stratifySurv(y, strata.surv)
+    }
+    fit <- glmnet(x=x,y=y2, family="cox",
+                   alpha=alpha,
+                   offset = NULL,
+                   lambda = seq(lambda*0.8,lambda*1.2,length=11),
+                   penalty.factor=adpen,
+                   intercept=intercept)
+    
+    ypred <- NULL
+    mse_val <- NULL
+    vs <- NULL
   }
   
   #==================
@@ -156,7 +223,7 @@ mixlasso <- function(x, y, z=NULL, x_test=NULL, y_test=NULL, z_test=NULL, p=NA, 
       # lambda.max <- sqrt(max(sapply(split(x, rep(1:ncol(x), each=nrow(x))), fun.lambda, y=y)))
       # lambda <- seq(lambda.max*0.1, lambda.max, length=5)
     }
-    fit <- epsgo(Q.func = "tune.tree.interval", bounds = bounds, lambda=lambda, N=N,
+    fit0 <- epsgo(Q.func = "tune.tree.interval", bounds = bounds, lambda=lambda, N=N,
                  parms.coding = "none", seed = seed, fminlower = fminlower, x = x, y = y, 
                  intercept=intercept, foldid = foldid, p=p, standardize.response=F, num.nonpen=num.nonpen,
                  min.iter=min.iter, verbose=verbose, parallel=parallel, EI.eps=EI.eps, threshold=threshold, ...)
@@ -203,12 +270,12 @@ mixlasso <- function(x, y, z=NULL, x_test=NULL, y_test=NULL, z_test=NULL, p=NA, 
     #   warning("Please provide a proper lambda sequence!")
     #   lambda <- seq(2,5,length=10)
     # }
-    fit <- epsgo(Q.func = "tune.tree.re.interval", bounds = bounds, bound.scale=bound.scale, alpha=alpha, N=N, tree.parm=tree.parm,
+    fit0 <- epsgo(Q.func = "tune.tree.re.interval", bounds = bounds, bound.scale=bound.scale, alpha=alpha, N=N, tree.parm=tree.parm,
                  parms.coding = "none", seed = seed, fminlower = fminlower, x = x, y = y, z = z,
                  intercept=intercept, foldid = foldid, cv.measure=cv.measure, p=p, standardize.response=F, num.nonpen=num.nonpen,
                  min.iter=min.iter, verbose=verbose, parallel=parallel, EI.eps=EI.eps, threshold=threshold, 
                  tol=tol,mu=mu,NoVar=NoVar,y.mis=y.mis,x.mis=x.mis,t.idx=t.idx,t.glasso=t.glasso,maxiter=maxiter,cov.proxy=cov.proxy,predict.re=predict.re, ...)
-    sumint <- summary(fit, verbose=F)
+    sumint <- summary(fit0, verbose=F)
     
     mse_cv0 <- sumint$opt.error
     lambda <- sumint$opt.lambda
@@ -216,8 +283,8 @@ mixlasso <- function(x, y, z=NULL, x_test=NULL, y_test=NULL, z_test=NULL, p=NA, 
     alpha <- sumint$opt.alpha
     ipf <- as.numeric(sumint$opt.ipf)
     
+    Xtemp <- x
     if(length(p) > 1){
-      Xtemp <- x
       for(i in 1:(length(p)-1)) Xtemp[,num.nonpen+(cumsum(p)[i]+1):cumsum(p)[i+1]] <- Xtemp[,num.nonpen+(cumsum(p)[i]+1):cumsum(p)[i+1]]/ipf[i]
       #x <- Xtemp
     }
@@ -290,7 +357,7 @@ mixlasso <- function(x, y, z=NULL, x_test=NULL, y_test=NULL, z_test=NULL, p=NA, 
       if(method == "IPF-tree-lasso-re") {
         return(list(cvm=mse_val, cvm_cv=mse_cv, cvm_cv0=mse_cv0, cvm_complete=mse_val_complete, cvm_cv_complete=mse_cv_complete, gamma=gamma, alpha=alpha, lambda=lambda, pred=ypred, ipf=ipf, Beta=fit$Beta, cv=vs, random.effects=fit$random.effects))
       }else{
-        return(list(cvm=mse_val, cvm_cv=mse_cv, alpha=alpha, lambda=lambda, pred=ypred, ipf=ipf, Beta=c(Beta$a0[ceiling(11/2)], Beta$beta[,ceiling(11/2)]), cv=vs, search.fit=fit))
+        return(list(cvm=mse_val, cvm_cv=mse_cv, alpha=alpha, lambda=lambda, pred=ypred, ipf=ipf, Beta=c(fit$a0[ceiling(11/2)], fit$beta[,ceiling(11/2)]), cv=vs, fit=fit, search.fit=fit0))
       }
     }
 }

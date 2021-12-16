@@ -296,7 +296,8 @@ epsgo<- function(
 					print(print( "At least one of the intial points is very close to the other points. It is not possible to fit the model via Gaussian Process. "))
 					break  
 				}
-				try(fit.gp<-mlegp(X, Q,constantMean=constantMean, seed=gp.seed.new, verbose=0))
+     	  suppressWarnings(
+				  try(fit.gp<-mlegp(X, Q,constantMean=constantMean, seed=gp.seed.new, verbose=0)))
      	  
 				flag.fit.gp<- FALSE
       	# if fit.gp exists AND is not null
@@ -420,7 +421,8 @@ epsgo<- function(
 					finished <- TRUE
 					break  
 				}
-				try(fit.gp<-mlegp(Xtrain, Ytrain,constantMean=constantMean, seed=gp.seed.new, verbose=0))
+     	  suppressWarnings(
+     	    try(fit.gp<-mlegp(Xtrain, Ytrain,constantMean=constantMean, seed=gp.seed.new, verbose=0)))
 				
 				flag.fit.gp<- FALSE
       	# if fit.gp exists AND is not null
