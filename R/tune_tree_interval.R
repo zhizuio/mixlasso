@@ -70,7 +70,7 @@ tune.tree.interval<-function(parms, x, y,
       cl <- makeCluster(cores)
       #clusterEvalQ(cl, library(mixLasso))
       registerDoParallel(cl)
-      cvm0[1:cores] <- foreach(i = 1:cores, .combine=c, .packages= c('base','Matrix','MASS')) %dopar%{
+      cvm0[1:cores] <- foreach(i = 1:cores, .combine=c, .packages= c('base','Matrix')) %dopar%{
         cv5(la.xx[i,2], la.xx[i,1])
       }
       stopCluster(cl)
@@ -80,7 +80,7 @@ tune.tree.interval<-function(parms, x, y,
       nCores <- min(length(lambda),16,detectCores()-1)
       cl <- makeCluster(nCores)
       registerDoParallel(cl)
-      cvm0[1:min(length(lambda),nCores)] <- foreach(i = 1:min(length(lambda),nCores), .combine=c, .packages= c('base','Matrix','MASS')) %dopar%{
+      cvm0[1:min(length(lambda),nCores)] <- foreach(i = 1:min(length(lambda),nCores), .combine=c, .packages= c('base','Matrix')) %dopar%{
         la.seq(lambda[i])
       }
       stopCluster(cl)

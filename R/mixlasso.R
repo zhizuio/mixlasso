@@ -4,7 +4,7 @@
 #' Function producing results of the structured penalized regression
 #' 
 #' @importFrom Matrix Diagonal bdiag
-#' @importFrom glmnet glmnet cv.glmnet
+#' @importFrom glmnet glmnet cv.glmnet stratifySurv
 #' @importFrom stats sd
 #' @importFrom parallel detectCores makeCluster	stopCluster clusterEvalQ
 #' @importFrom foreach foreach %dopar%
@@ -137,7 +137,7 @@ mixlasso <- function(x, y, z=NULL, x_test=NULL, y_test=NULL, z_test=NULL, p=NA, 
     if(is.null(strata.surv)){
       y2 <- y
     }else{
-      y2 <- stratifySurv(y, strata.surv)
+      y2 <- glmnet::stratifySurv(y, strata.surv)
     }
     fit <- glmnet(x=x,y=y2, family="cox",
                    alpha=alpha,
@@ -179,7 +179,7 @@ mixlasso <- function(x, y, z=NULL, x_test=NULL, y_test=NULL, z_test=NULL, p=NA, 
       cl <- makeCluster(cores)
       #clusterEvalQ(cl, library(mixlasso))
       registerDoParallel(cl)
-      cvm0[1:cores] <- foreach(i = 1:cores, .combine=c, .packages= c('base','Matrix','MASS')) %dopar%{
+      cvm0[1:cores] <- foreach(i = 1:cores, .combine=c, .packages= c('base','Matrix')) %dopar%{
         cv5(la.xx[i,2], la.xx[i,1])
       }
       stopCluster(cl)

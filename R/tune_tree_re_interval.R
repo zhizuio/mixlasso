@@ -153,7 +153,7 @@ tune.tree.re.interval<-function(parms, x, y, z=z,
     cores <- length(cvm0)
     cl <- makeCluster(cores)
     registerDoParallel(cl)
-    cvm0[1:cores] <- foreach(i = 1:cores, .combine='c', .packages= c('base','MASS','Matrix')) %dopar%{
+    cvm0[1:cores] <- foreach(i = 1:cores, .combine='c', .packages= c('base','Matrix')) %dopar%{
         cvk(al.xx[i,2], al.xx[i,1])#, alpha)
     }
     cvm0 <- colMeans( matrix(cvm0, ncol=length(alpha), byrow=TRUE) )
@@ -170,12 +170,12 @@ tune.tree.re.interval<-function(parms, x, y, z=z,
       if(length(alpha)>1){
         cvm0 <- rep(0,length(alpha))
         for(idx.al in 1:length(alpha)){
-          cvm0[idx.al] <- mean( foreach(i = 1:cores, .combine='c', .packages= c('base','MASS','Matrix')) %dopar%{cvk(i, alpha[idx.al])} )
+          cvm0[idx.al] <- mean( foreach(i = 1:cores, .combine='c', .packages= c('base','Matrix')) %dopar%{cvk(i, alpha[idx.al])} )
         }
         opt.alpha <- alpha[which.min(cvm0)]
         q.val <- min(cvm0)
       }else{
-        q.val <- mean( foreach(i = 1:cores, .combine='c', .packages= c('base','MASS','Matrix')) %dopar%{cvk(i, alpha)} )
+        q.val <- mean( foreach(i = 1:cores, .combine='c', .packages= c('base','Matrix')) %dopar%{cvk(i, alpha)} )
       }
       stopCluster(cl)
     }else{

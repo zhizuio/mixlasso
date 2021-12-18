@@ -151,7 +151,7 @@ tune.glmnet.interval<-function(parms, x, y,
       if(sum(parallel)==1){
         cl <- makeCluster(min(length(lambda),15))
         registerDoParallel(cl)
-        cvm0[1:min(length(lambda),15)] <- foreach(i = 1:min(length(lambda),15), .combine=c, .packages= c('base','Matrix','MASS')) %dopar%{
+        cvm0[1:min(length(lambda),15)] <- foreach(i = 1:min(length(lambda),15), .combine=c, .packages= c('base','Matrix')) %dopar%{
           adpen00 <- adpen00
           laSeqHeteAlpha(lambda[i])
         }

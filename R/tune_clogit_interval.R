@@ -120,7 +120,7 @@ tune.clogit.interval<-function(parms, x=x, y=y,
       # clusterEvalQ(cl, library(penalized,lib.loc="/home/zhiz/RLibrary"))
       # clusterEvalQ(cl, library(mixPenalty,lib.loc="/home/zhiz/RLibrary"))
       registerDoParallel(cl)
-      cvm[1:min(length(lambda),nCores)] <- foreach(i = 1:min(length(lambda),nCores), .combine=c, .packages= c('base','Matrix','MASS')) %dopar%{
+      cvm[1:min(length(lambda),nCores)] <- foreach(i = 1:min(length(lambda),nCores), .combine=c, .packages= c('base','Matrix')) %dopar%{
         cv.k(lambda[i])
       }
       stopCluster(cl)

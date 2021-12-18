@@ -80,7 +80,7 @@ tune.surv.interval<-function(parms, x=x, y=y,
   if(is.null(strata.surv)){
     y2 <- y
   }else{
-    y2 <- stratifySurv(y, strata.surv)
+    y2 <- glmnet::stratifySurv(y, strata.surv)
   }
   
   #  2. find optimal lambda for given alpha and penalty factors ###########################
