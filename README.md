@@ -1,6 +1,6 @@
 # mixlasso
 
-This package extends [IPFStructPenalty](/zhizuio/IPFStructPenalty) for stratum-specific feature selection by using varying coefficients and random effects. The core algorithms of tree lasso have been coded in C++ for computational efficiency.
+This package extends [IPFStructPenalty](https://github.com/zhizuio/IPFStructPenalty) for stratum-specific feature selection by using varying coefficients and random effects. The core algorithms of tree lasso have been coded in C++ for computational efficiency.
 
 # R package instruction
 
